@@ -1,6 +1,5 @@
 class CalcController{
 
-    // Criando o método construtor
     constructor(){
 
         this._operation = []
@@ -19,18 +18,21 @@ class CalcController{
     }
 
     initialize(){
-        
-        // Imprime da DOM a data e a hora
+
         this.setDisplayDateTime()
 
         setInterval(() => {
 
-            // Atualiza a data e a hora no intervalo de 1s
            this.setDisplayDateTime()
 
         }, 1000)
-
     }
+
+
+
+
+
+
 
     // Método para aplicar multiplos eventos
     // Recebe o elemento, String de evento, classe em forma de valor
@@ -47,6 +49,11 @@ class CalcController{
 
     }
 
+
+
+
+
+
     clearAll(){
         this._operation = []
     }
@@ -56,13 +63,22 @@ class CalcController{
     }
 
     addOperation(value){
+
         this._operation.push(value)
-        console.log(this._operation)
+
+        //-- Ultima edição aqui
+        console.log(`Elemento clicado: ${this._operation}`)
+
     }
 
     setError(){
         this.displayCalc = "Error"
     }
+
+
+
+
+
 
     execBtn(value){
 
@@ -120,18 +136,20 @@ class CalcController{
 
     }
 
+
+
+
+
+
     // Buttons
     initButtonsEvents(){
-        //Recebe todos os elementos
+
         let buttons = document.querySelectorAll("#buttons > g, #parts > g")
 
-        // Percorre todos os elementos e buscando os parametros
         buttons.forEach((btn) => {
             
-            // Adiciona um evento em cada um dos elementos do metodo
             this.addEventListenerAll(btn, "click drag", (e, index) => {
 
-                // Traz somente o nome da classe removento o 'btn-' e deixando apenas no número
                 let textBtn = btn.className.baseVal.replace("btn-", "")
 
                 this.execBtn(textBtn)
@@ -139,13 +157,17 @@ class CalcController{
             })
 
             this.addEventListenerAll(btn, "mouseover mouseup mousedown", (e) => {
-                // Estiliza o cursor do mouse
+
                 btn.style.cursor = "pointer"
+
             })
 
         })
 
     }
+
+
+
 
 
     // DateTime
@@ -160,7 +182,11 @@ class CalcController{
         this.displayTime = this.currentDate.toLocaleTimeString(this._locale)
     }
 
-    // Get - Set Date
+
+
+
+
+    // Get - Set | Date
     get displayDate(){
         return this._dateElement.innerHTML
     }
@@ -168,7 +194,7 @@ class CalcController{
         this._dateElement.innerHTML = value
     }
 
-    // Get - Set Time
+    // Get - Set | Time
     get displayTime(){
         return this._timeElement.innerHTML
     }
@@ -176,7 +202,7 @@ class CalcController{
         this._timeElement.innerHTML = value
     }
 
-    // Get - Set Display
+    // Get - Set | Display
     get displayCalc(){
         return this._displayCalcElement.innerHTML
     }
@@ -184,6 +210,7 @@ class CalcController{
         this._displayCalcElement.innerHTML = value
     }
 
+    
     // Recebe a data atual em formato de milissegundos
     get currentDate(){
         return new Date()
