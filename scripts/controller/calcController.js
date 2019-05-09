@@ -2,6 +2,8 @@ class CalcController{
 
     constructor(){
 
+        this._audio = new Audio('click.mp3')
+        this._audioOnOff = false
         this._lastOperator = ''
         this._lastNumber = ''
 
@@ -19,8 +21,41 @@ class CalcController{
         this.execBtn()
         this.setLastNumberToDisplay()
         this.initKeyboard()
+ 
+    }
+
+
+    pasteFromClipboard(){
+
+        document.addEventListener('paste', (e) => {
+
+            let text = e.clipboardData.getData('Text')
+
+            this._operation[0] = parseFloat(text)
+            
+            this.displayCalc = parseFloat(text)
+
+        })
 
     }
+
+
+    copyToClipboard(){
+
+        let input = document.createElement('input')
+
+        input.value = this.displayCalc
+
+        document.body.appendChild(input)
+
+        input.select()
+
+        document.execCommand("Copy")
+
+        input.remove()
+
+    }
+
 
     initialize(){
 
@@ -34,14 +69,44 @@ class CalcController{
         }, 1000)
 
         this.setLastNumberToDisplay()
+        this.pasteFromClipboard()
+
+        document.querySelectorAll('.btn-ac').forEach(btn => {
+
+            btn.addEventListener('dblclick', (e) => {
+
+                this.toogleAudio()
+
+            })
+
+        })
 
     }
+
+    toogleAudio(){
+
+        this._audioOnOff = !this._audioOnOff
+
+    }
+
+
+    playAudio(){
+
+        if(this._audioOnOff){
+
+            this._audio.currentTime = 0
+            this._audio.play()
+
+        }
+
+    }
+
 
     initKeyboard(){
 
         document.addEventListener('keyup', (e) => {
 
-            console.log(e.key)
+            this.playAudio()
 
             switch(e.key){
                 case 'Escape':
@@ -88,6 +153,10 @@ class CalcController{
                     this.addOperation(parseInt(e.key))
                     
                 break;
+
+                case 'c':
+                    if(e.ctrlKey) this.copyToClipboard()
+                break;
     
             }
 
@@ -96,29 +165,15 @@ class CalcController{
     }
 
 
-
-
-
-
-
-    // Método para aplicar multiplos eventos
-    // Recebe o elemento, String de evento, classe em forma de valor
     addEventListenerAll(element, events, func){
 
-        // Transforma a String de eventos em um Array e percorre os valores
-        // Cria uma função que recebe como argumento
         events.split(' ').forEach((event) => {
 
-            // Adiciona em cada elemento o tipo de evento que foi separado pelo 'split'
             element.addEventListener(event, func, false)
 
         })
 
-    }
-
-
-
-
+    }   
 
 
     clearAll(){
@@ -128,6 +183,7 @@ class CalcController{
 
         this.setLastNumberToDisplay()
     }
+
 
     clearEntry(){
         this._operation.pop()
@@ -142,6 +198,7 @@ class CalcController{
 
     }
 
+
     setLastOperation(value){
         
         this._operation[this._operation.length - 1] = value
@@ -155,6 +212,7 @@ class CalcController{
 
     }
 
+
     pushOperation(value){
 
         this._operation.push(value)
@@ -167,15 +225,26 @@ class CalcController{
 
     }
 
+
     getResult(){
 
-        console.log('this._operation = ',this._operation)
-        console.log('this._lastOperator = ',this._lastOperator)
-        console.log('this._lastNumber = ',this._lastNumber)
+        try{
 
-        return eval(this._operation.join(""))
+            return eval(this._operation.join(""))
+
+        }
+        catch(e){
+            
+            setTimeout(() => {
+
+                this.setError()
+
+            }, 1)
+        }
+        
 
     }
+    
 
     calc(){
 
@@ -265,7 +334,6 @@ class CalcController{
     }
 
 
-
     addOperation(value){
 
         if(isNaN(this.getLastOperation())) {
@@ -303,13 +371,10 @@ class CalcController{
         }
     }
 
+
     setError(){
-        this.displayCalc = ""
+        this.displayCalc = "Error"
     }
-
-
-
-
 
 
     addDot(){
@@ -334,12 +399,9 @@ class CalcController{
     }
 
 
-
-
-
-
-
     execBtn(value){
+
+        this.playAudio()
 
         switch(value){
             case 'ac':
@@ -412,10 +474,6 @@ class CalcController{
     }
 
 
-
-
-
-
     // Buttons
     initButtonsEvents(){
 
@@ -442,10 +500,6 @@ class CalcController{
     }
 
 
-
-
-
-    // DateTime
     setDisplayDateTime(){
         this.displayDate = this.currentDate.toLocaleDateString(this._locale, {
 
@@ -471,6 +525,7 @@ class CalcController{
         return this._timeElement.innerHTML
     }
     set displayTime(value){
+
         this._timeElement.innerHTML = value
     }
 
@@ -479,9 +534,16 @@ class CalcController{
         return this._displayCalcElement.innerHTML
     }
     set displayCalc(value){
+
+        if(value.toString().length > 10){
+
+            this.setError()
+            return false
+
+        }
+
         this._displayCalcElement.innerHTML = value
     }
-
     
     // Recebe a data atual em formato de milissegundos
     get currentDate(){
@@ -490,4 +552,5 @@ class CalcController{
     set currentDate(value){
         this._currentDate = value;
     }
+    
 }
